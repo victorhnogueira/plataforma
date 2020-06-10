@@ -36,4 +36,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function curso()
+    {
+        return $this->belongsTo(Curso::class, "curso_id", "id");
+    }
+
+    public function cargo()
+    {
+        return $this->belongsTo(Cargo::class, "cargo_id", "id");
+    }
 }

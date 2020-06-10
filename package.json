@@ -19,10 +19,13 @@
         "popper.js": "^1.12",
         "resolve-url-loader": "^3.1.0",
         "sass": "^1.15.2",
-        "sass-loader": "^8.0.0"
+        "sass-loader": "^8.0.0",
+        "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
         "bootstrap": "^4.4.1",
-        "jquery": "^3.5.0"
+        "codemirror": "^5.54.0",
+        "jquery": "^3.5.0",
+        "summernote": "^0.8.18"
     }
 }
