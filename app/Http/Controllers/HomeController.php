@@ -29,10 +29,10 @@ class HomeController extends Controller
     }
     public function projetos()
     {
-        return view('projetos');
+        return view('projetos.index');
     }
-    public function projetosdetalhes()
+    public function projetosGerenciar()
     {
-        return view('visualizacaoprojeto');
+        return view('projetos.gerenciar');
     }
 }

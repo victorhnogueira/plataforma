@@ -25,7 +25,7 @@
     "dependencies": {
         "bootstrap": "^4.4.1",
         "codemirror": "^5.54.0",
-        "jquery": "^3.5.0",
+        "jquery": "^3.5.1",
         "summernote": "^0.8.18"
     }
 }

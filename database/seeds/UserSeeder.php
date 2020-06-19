@@ -37,6 +37,54 @@ class UserSeeder extends Seeder
             "endereco" => "Av das lamentações, 541, Centro"
         ]);
 
+        DB::table('users')->insert([
+            'name' => "Marcus Meireles",
+            'email' => 'marcusmeireles@conselt.com.br',
+            'password' => Hash::make('conselt123'),
+            'numero_matricula' => "10033EBI050",
+            "curso_id" => 1,
+            "cargo_id" => 1,
+            "data_ingresso" => "2016-08-01",
+            "status" => "ativo",
+            "pontos_gamification" => 0,
+            "data_nascimento" => "1998-08-01",
+            "rg" => "41.548.754-1",
+            "cpf" => "451.154.121-45",
+            "endereco" => "Av das lamentações, 541, Centro"
+        ]);
+
+        DB::table('users')->insert([
+            'name' => "Marcela Castellani",
+            'email' => 'marcelacastellani@conselt.com.br',
+            'password' => Hash::make('conselt123'),
+            'numero_matricula' => "10033EBI050",
+            "curso_id" => 1,
+            "cargo_id" => 1,
+            "data_ingresso" => "2016-08-01",
+            "status" => "ativo",
+            "pontos_gamification" => 0,
+            "data_nascimento" => "1998-08-01",
+            "rg" => "41.548.754-1",
+            "cpf" => "451.154.121-45",
+            "endereco" => "Av das lamentações, 541, Centro"
+        ]);
+
+        DB::table('users')->insert([
+            'name' => "Membro Teste",
+            'email' => 'membroteste@conselt.com.br',
+            'password' => Hash::make('conselt123'),
+            'numero_matricula' => "10033EBI050",
+            "curso_id" => 1,
+            "cargo_id" => 1,
+            "data_ingresso" => "2016-08-01",
+            "status" => "ativo",
+            "pontos_gamification" => 0,
+            "data_nascimento" => "1998-08-01",
+            "rg" => "41.548.754-1",
+            "cpf" => "451.154.121-45",
+            "endereco" => "Av das lamentações, 541, Centro"
+        ]);
+
         DB::table('materiaisdeapoio')->insert([
             'titulo' => "Como migrar website usando FileZilla",
             'descricao' => 'Migrando um site wordpress sem plugins',

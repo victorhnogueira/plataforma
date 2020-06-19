@@ -28,3 +28,10 @@ Route::get('/capacitacoes/materiaisdeapoio/novo', 'MateriaisDeApoioController@no
 Route::get('/capacitacoes/materiaisdeapoio/search', 'MateriaisDeApoioController@search')->name('capacitacoes.materiaisapoio.search.do');
 Route::post('/capacitacoes/materiaisdeapoio/create', 'MateriaisDeApoioController@create')->name('capacitacoes.materiaisapoio.create.do');
 Route::get('/capacitacoes/materiaisdeapoio/{materialDeApoio}', 'MateriaisDeApoioController@showitem')->name('capacitacoes.materiaisapoio.showitem');
+
+
+Route::get('/projetos', 'HomeController@projetos')->name('projetos.show');
+Route::get('/projetos/gerenciar', 'HomeController@projetosGerenciar')->name('projetos.gerenciar');
+
+
+Route::get('/perfil', 'UserController@show')->name('perfil.show');

@@ -1,4 +1,4 @@
-@extends('layouts.loggedtemplate')
+@extends('layouts.basetemplate.index.blade.php')
 
 @section('content')
     <form method="post" action="{{ route('capacitacoes.materiaisapoio.create.do') }}">

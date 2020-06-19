@@ -135,9 +135,9 @@
                               <button type="button" class="btn btn-light seeprojectdetailspopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Ver detalhes do projeto">
                                   <i class="far fa-eye"></i>
                               </button>
-                              <button type="button" class="btn btn-secondary manageprojectpopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Gerenciar projeto">
+                              <a href="{{ route('projetos.gerenciar') }}" type="button" class="btn btn-secondary manageprojectpopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Gerenciar projeto">
                                   <i class="fas fa-tasks"></i>
-                              </button>
+                              </a>
                           </div>
                       </td>
                   </tr>
