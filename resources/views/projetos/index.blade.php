@@ -1,6 +1,7 @@
 @extends('layouts.basetemplate.index')
 
 @section('content')
+    <script src="{{ url(mix('site/js/novoProjeto.js')) }}"></script>
   <style>
     #tabela-projetos tbody > tr > td{
       font-size: 14px;
@@ -30,19 +31,7 @@
 
   </style>
 
-  <script>
-    $(function () {
-      $('.seeprojectdetailspopover').popover({
-        trigger: 'hover'
-      })
-
-      $('.manageprojectpopover').popover({
-        trigger: 'hover'
-      })
-    })
-  </script>
-
-  <div class="jumbotron jumbotron-fluid bg-white">
+  <div class="jumbotron jumbotron-fluid bg-gray-100">
     <div class="container">
       <h1 class="display-4">Projetos</h1>
       <p class="lead">Listagem dos projetos em andamento e concluidos</p>
@@ -52,11 +41,17 @@
   <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
           <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">
-              <i class="fas fa-star"></i>
+              <i class="fas fa-pencil-ruler"></i>
               <span>Todos os Projetos</span>
           </a>
-          <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Outra opção</a>
-          <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Outra opção</a>
+          <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">
+              <i class="fas fa-users"></i>
+              <span>Membros em projetos</span>
+          </a>
+          <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">
+              <i class="fas fa-list-ul"></i>
+              <span>Registro de atividades</span>
+          </a>
       </div>
   </nav>
   <div class="tab-content" id="nav-tabContent">
@@ -64,9 +59,9 @@
           <div class="d-flex justify-content-between mt-3 mb-3">
               <div class="input-group w-50">
                   <div class="input-group-prepend">
-                      <button class="btn btn-outline-secondary" type="button" id="button-addon1"><i class="fas fa-filter"></i></button>
+                      <button class="btn btn-outline-secondary" type="button" id="button-show-project-filter" title="Exibir filtros avançados"><i class="fas fa-filter"></i></button>
                   </div>
-                  <input type="text" class="form-control" placeholder="Buscar projeto..." aria-label="Example text with button addon" aria-describedby="button-addon1">
+                  <input type="text" id="input-buscar-projeto" class="form-control" placeholder="Buscar pelo nome do projeto ou numero do contrato" aria-label="Buscar pelo nome do projeto ou numero do contrato" aria-describedby="Buscar pelo nome do projeto ou numero do contrato">
               </div>
               <div class="btn-group h-100">
                   <button type="button" class="btn btn-success" data-toggle="modal" data-target="#novoProjetoModal">Novo projeto</button>
@@ -78,6 +73,94 @@
                   </div>
               </div>
           </div>
+
+          <!-- begin: Filter div -->
+          <div id="project-filter-container" class="d-none mt-4 mb-4">
+              <div class="row">
+                <div class="container">
+                    <p class="font-weight-bold ">Filtros:</p>
+                </div>
+              </div>
+              <div class="row">
+                  <div class="col-4">
+                      <div class="form-group">
+                          <label class="font-weight-bold" for="selectProjetosServico">Serviços</label>
+
+                          <select id="selectProjetosServico" class="form-control selectpicker filter-input" multiple>
+                              @foreach($servicos_da_cartilha as $servico)
+                                  <option value="{{ $servico->id }}">{{ $servico->nome }}</option>
+                              @endforeach
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                          <label class="font-weight-bold" for="selectProjetosStatus">Status</label>
+
+                          <select id="selectProjetosStatus" class="form-control selectpicker" multiple>
+                              <option value="0">Em Desenvolvimento, no prazo</option>
+                              <option value="0">Em Desenvolvimento, atrasado</option>
+                              <option value="1">Finalizado, no prazo</option>
+                              <option value="1">Finalizado, atrasado</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="col-4">
+                      <div class="form-group">
+                          <label for="selectProjetosGerente" class="font-weight-bold">Gerente</label>
+
+                          <select id="selectProjetosGerente" class="form-control selectpicker filter-input" multiple>
+                              @foreach($membros as $membro)
+                                  <option value="{{ $membro->id }}">{{ $membro->name.' - '.$membro->cargo->nome }}</option>
+                              @endforeach
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                          <label for="selectProjetosMembros" class="font-weight-bold">Membros participantes</label>
+
+                          <select id="selectProjetosMembros" class="form-control selectpicker" multiple>
+                              @foreach($membros as $membro)
+                                  <option value="{{ $membro->id }}">{{ $membro->name.' - '.$membro->cargo->nome}}</option>
+                              @endforeach
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                          <label for="selectProjetosCliente" class="font-weight-bold">Cliente</label>
+
+                          <select id="selectProjetosCliente" class="form-control selectpicker filter-input" multiple>
+                              @foreach($clientes as $cliente)
+                                  <option value="{{ $cliente->id }}">{{ $cliente->nome}}</option>
+                              @endforeach
+                          </select>
+                      </div>
+                  </div>
+                  <div class="col-4">
+                      <div class="form-group">
+                          <label for="exampleFormControlSelect1">Tipo de projeto</label>
+
+                          <select id="selectProjetosTipo" class="form-control selectpicker" multiple>
+                              <option value="0">Ação compartilhada</option>
+                              <option value="1">Projeto de impacto</option>
+                              <option value="1">Indicação</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="container d-flex justify-content-end">
+                      <button id="button-clear-filter-data" class="btn btn-outline-danger">
+                          <i class="fas fa-times"></i>
+                          <span>limpar filtro</span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+          <!-- end: Filter div -->
+
+          <!-- Exibe a quantidade de resultados quando retorna a request -->
+          <p id="qtd-resultado-busca"></p>
+
           <div class="table-responsive">
               <table id="tabela-projetos" class="table table-md table-striped table-hover">
                   <thead>
@@ -93,89 +176,258 @@
                       <th class="align-middle" scope="col">Ações</th>
                   </tr>
                   </thead>
-                  <tbody>
-                  <tr>
-                      <th class="align-middle" scope="row">1010</th>
-                      <td class="align-middle">Udisigns</td>
-                      <td class="align-middle">E-commerce</td>
-                      <td class="align-middle">Cristina dos Santos Toledo</td>
-                      <td class="align-middle">
-                          <div class="membrogerentetab">
-                              <img src="{{ asset('images/felipe.png') }}" class="rounded float-left" alt="...">
-                              <p>Felipe</p>
-                          </div>
-                      </td>
-                      <td class="align-middle">13/04/2020</td>
-                      <td class="align-middle">15/05/2020</td>
-                      <td class="align-middle">40%</td>
-                      <td class="align-middle">
-                          <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                              <button type="button" class="btn btn-light seeprojectdetailspopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Ver detalhes do projeto">
-                                  <i class="far fa-eye"></i>
-                              </button>
-                          </div>
-                      </td>
-                  </tr>
-                  <tr>
-                      <th class="align-middle" scope="row">1010</th>
-                      <td class="align-middle">Colégio Alternativo</td>
-                      <td class="align-middle">Website</td>
-                      <td class="align-middle">Cristina dos Santos Toledo</td>
-                      <td class="align-middle">
-                          <div class="membrogerentetab">
-                              <img src="{{ asset('images/victor.png') }}" class="rounded float-left" alt="...">
-                              <p>{{Auth::user()->name}}</p>
-                          </div>
-                      </td>
-                      <td class="align-middle">13/04/2020</td>
-                      <td class="align-middle">15/05/2020</td>
-                      <td class="align-middle">40%</td>
-                      <td class="align-middle">
-                          <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                              <button type="button" class="btn btn-light seeprojectdetailspopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Ver detalhes do projeto">
-                                  <i class="far fa-eye"></i>
-                              </button>
-                              <a href="{{ route('projetos.gerenciar') }}" type="button" class="btn btn-secondary manageprojectpopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Gerenciar projeto">
-                                  <i class="fas fa-tasks"></i>
-                              </a>
-                          </div>
-                      </td>
-                  </tr>
-                  @for ($i = 0; $i < 10; $i++)
+                  <tbody id="projetos-table-body">
+                  @foreach($projetos as $projeto)
                       <tr>
-                          <th class="align-middle" scope="row">101{{$i}}</th>
-                          <td class="align-middle">Udisigns</td>
-                          <td class="align-middle">E-commerce</td>
-                          <td class="align-middle">Cristina dos Santos Toledo</td>
+                          <th class="align-middle" scope="row">{{ $projeto->numero_contrato }}</th>
+                          <td class="align-middle">
+                              <span>{{ $projeto->nome }}</span>
+                          </td>
+                          <td class="align-middle">{{ $projeto->servico->nome }}</td>
+                          <td class="align-middle">{{ $projeto->cliente->nome }}</td>
                           <td class="align-middle">
                               <div class="membrogerentetab">
-                                  <img src="{{ asset('images/felipe.png') }}" class="rounded float-left" alt="...">
-                                  <p>Felipe</p>
+                                  <img  src="{{ asset('images/'.$projeto->gerente->profile_image) }}" class="rounded float-left" alt="{{ $projeto->gerente->name }}">
+                                  <p>{{ $projeto->gerente->firstName() }}</p>
                               </div>
                           </td>
-                          <td class="align-middle">13/04/2020</td>
-                          <td class="align-middle">15/05/2020</td>
+                          <td class="align-middle">{{ $projeto->data_assinatura_contrato }}</td>
                           <td class="align-middle">
-                              @if($i <= 3)
-                                  40%
-                              @else
-                                  Finalizado
+                              {{ $projeto->data_entrega_no_contrato }}
+
+                              @if( $projeto->esta_atrasado() )
+                                  <button class="btn btn-sm btn-danger btn-icon-split"> <span class="icon text-white-50"> <i class="fas fa-exclamation-triangle"></i> </span> <span class="text">{{$projeto->dias_para_entrega()}} dias de atraso</span> </button>
                               @endif
                           </td>
+                          <td class="align-middle">40%</td>
                           <td class="align-middle">
                               <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                   <button type="button" class="btn btn-light seeprojectdetailspopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Ver detalhes do projeto">
                                       <i class="far fa-eye"></i>
                                   </button>
+                                  @if(Auth::user()->id === $projeto->gerente->id)
+                                      <a href="{{ route('projetos.gerenciar') }}" type="button" class="btn btn-secondary manageprojectpopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Gerenciar projeto">
+                                          <i class="fas fa-tasks"></i>
+                                      </a>
+                                  @endif
                               </div>
                           </td>
                       </tr>
-                  @endfor
+                  @endforeach
                   </tbody>
               </table>
           </div>
       </div>
-      <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">.2.</div>
+      <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+
+
+
+
+
+
+          <div class="d-flex justify-content-between mt-3 mb-3">
+              <div class="input-group w-50">
+                  <div class="input-group-prepend">
+                      <button class="btn btn-outline-secondary" type="button" id="button-toggle-advanced-member-project-filter" title="Exibir filtros avançados"><i class="fas fa-filter"></i></button>
+                  </div>
+                  <input type="text" id="input-buscar-membro-projeto" class="form-control" placeholder="Buscar pelo nome do membro ou numero de matricula" aria-label="Buscar pelo nome do membro ou numero de matricula" aria-describedby="Buscar pelo nome do membro ou numero de matricula">
+              </div>
+          </div>
+
+          <!-- begin: Filter div -->
+          <div id="user-project-filter-container" class="d-none mt-4 mb-4">
+              <div class="container">
+                <div class="row">
+                      <p class="font-weight-bold ">Filtros:</p>
+                </div>
+              </div>
+              <div class="row">
+                  <div class="col-4">
+                      <div class="form-group">
+                          <label class="font-weight-bold" for="selectMembrosProjetosServico">Serviços</label>
+
+                          <select id="selectMembrosProjetosServico" class="form-control selectpicker filter-input-membro-projeto" multiple>
+                              @foreach($servicos_da_cartilha as $servico)
+                                  <option value="{{ $servico->id }}">{{ $servico->nome }}</option>
+                              @endforeach
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                          <label class="font-weight-bold" for="selectMembrosProjetosStatus">Status</label>
+
+                          <select id="selectMembrosProjetosStatus" class="form-control selectpicker" multiple>
+                              <option value="0">Em Desenvolvimento, no prazo</option>
+                              <option value="0">Em Desenvolvimento, atrasado</option>
+                              <option value="1">Finalizado, no prazo</option>
+                              <option value="1">Finalizado, atrasado</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="col-4">
+                      <div class="form-group">
+                          <label for="selectMembrosProjetosGerente" class="font-weight-bold">Gerente</label>
+
+                          <select id="selectMembrosProjetosGerente" class="form-control selectpicker filter-input-membro-projeto" multiple>
+                              @foreach($membros as $membro)
+                                  <option value="{{ $membro->id }}">{{ $membro->name.' - '.$membro->cargo->nome }}</option>
+                              @endforeach
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                          <label for="selectMembrosProjetosMembros" class="font-weight-bold">Membros participantes</label>
+
+                          <select id="selectMembrosProjetosMembros" class="form-control selectpicker" multiple>
+                              @foreach($membros as $membro)
+                                  <option value="{{ $membro->id }}">{{ $membro->name.' - '.$membro->cargo->nome}}</option>
+                              @endforeach
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                          <label for="selectMembrosProjetosCliente" class="font-weight-bold">Cliente</label>
+
+                          <select id="selectMembrosProjetosCliente" class="form-control selectpicker filter-input-membro-projeto" multiple>
+                              @foreach($clientes as $cliente)
+                                  <option value="{{ $cliente->id }}">{{ $cliente->nome}}</option>
+                              @endforeach
+                          </select>
+                      </div>
+                  </div>
+                  <div class="col-4">
+                      <div class="form-group">
+                          <label for="exampleFormControlSelect1">Tipo de projeto</label>
+
+                          <select id="selectProjetosTipo" class="form-control selectpicker" multiple>
+                              <option value="0">Ação compartilhada</option>
+                              <option value="1">Projeto de impacto</option>
+                              <option value="1">Indicação</option>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <label for="exampleFormControlSelect1">Gestão</label>
+
+                          <select id="selectProjetosTipo" class="form-control selectpicker" multiple>
+                              <option value="0">2019-1</option>
+                              <option value="0">2019-2</option>
+                              <option value="0">2020-1</option>
+                              <option value="0">2020-2</option>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <label for="exampleFormControlSelect1">Coordenadoria</label>
+
+                          <select id="selectProjetosTipo" class="form-control selectpicker" multiple>
+                              <option value="0">Projetos</option>
+                              <option value="0">Marketing</option>
+                              <option value="0">Parcerias</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="container d-flex justify-content-end">
+                      <button id="button-clear-filter-membro-projeto-data" class="btn btn-outline-danger">
+                          <i class="fas fa-times"></i>
+                          <span>limpar filtro</span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+
+
+
+
+
+
+          @foreach($membros as $membro)
+          <div class="container-fluid pt-4 pb-2 my-2">
+              <div class="row">
+                      <div class="col">
+                          <img style="height: 50px; width: 50px; margin-right: 10px;" src="{{ asset('images/'.$membro->profile_image) }}" class="rounded float-left" alt="{{ $projeto->gerente->name }}">
+                          <div class="">
+                              <h5 class="font-weight-bold" style="">{{ $membro->name.' - '.$membro->cargo->nome}}</h5>
+                              <p class=""><span class="font-weight-bold">Projetos:</span> {{ count($membro->projetos) }} (1 na gestão Atual) <span class="font-weight-bold">Média NPS:</span> 8</p>
+                          </div>
+                      </div>
+
+                      <div class="col-auto">
+                          <div class="btn-group">
+                              <button class="btn btn-danger"></button>
+                          </div>
+                      </div>
+              </div>
+          </div>
+          <div class="table-responsive mb-5">
+              <table id="tabela-projetos" class="table table-md table-striped table-hover">
+                  <thead>
+                  <tr>
+                      <th class="align-middle" scope="col">Contrato</th>
+                      <th class="align-middle" scope="col">Nome do projeto</th>
+                      <th class="align-middle" scope="col">Tipo de serviço</th>
+                      <th class="align-middle" scope="col">Função</th>
+                      <th class="align-middle" scope="col">Gerente</th>
+                      <th class="align-middle" scope="col">Gestão</th>
+                      <th class="align-middle" scope="col">NPS</th>
+                      <th class="align-middle" scope="col">Término previsto</th>
+                      <th class="align-middle" scope="col">Status</th>
+                      <th class="align-middle" scope="col">Ações</th>
+                  </tr>
+                  </thead>
+                  <tbody id="projetos-table-body">
+                  @if(count($membro->projetos) > 0)
+                      @foreach($membro->projetos as $projeto)
+                          <tr>
+                              <th class="align-middle" scope="row">{{ $projeto->numero_contrato }}</th>
+                              <td class="align-middle">
+                                  <span>{{ $projeto->nome }}</span>
+                              </td>
+                              <td class="align-middle">{{ $projeto->servico->nome }}</td>
+                              <td class="align-middle">{{ $projeto->pivot->funcao }}</td>
+                              <td class="align-middle">
+                                  <div class="membrogerentetab">
+                                      <img  src="{{ asset('images/'.$projeto->gerente->profile_image) }}" class="rounded float-left" alt="{{ $projeto->gerente->name }}">
+                                      <p>{{ $projeto->gerente->firstName() }}</p>
+                                  </div>
+                              </td>
+                              <td class="align-middle">
+                                  <span style="white-space: nowrap">2020-1</span>
+                              </td>
+                              <td class="align-middle">8.5</td>
+                              <td class="align-middle">
+                                  {{ $projeto->data_entrega_no_contrato }}
+
+                                  @if( $projeto->esta_atrasado() )
+                                      <button class="btn btn-sm btn-danger btn-icon-split"> <span class="icon text-white-50"> <i class="fas fa-exclamation-triangle"></i> </span> <span class="text">{{$projeto->dias_para_entrega()}} dias</span> </button>
+                                  @endif
+                              </td>
+                              <td class="align-middle">Finalizado</td>
+                              <td class="align-middle">
+                                  <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                                      <button type="button" class="btn btn-light seeprojectdetailspopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Ver detalhes do projeto">
+                                          <i class="far fa-eye"></i>
+                                      </button>
+                                      @if(Auth::user()->id === $projeto->gerente->id)
+                                          <a href="{{ route('projetos.gerenciar') }}" type="button" class="btn btn-secondary manageprojectpopover" data-container="body" data-toggle="popover" data-placement="top" data-content="Gerenciar projeto">
+                                              <i class="fas fa-tasks"></i>
+                                          </a>
+                                      @endif
+                                  </div>
+                              </td>
+                          </tr>
+                      @endforeach
+                  @else
+                      <tr>
+                          <td colspan="42"><h4>{{ $membro->firstName() }} ainda não participou de nenhum projeto</h4></td>
+                      </tr>
+                  @endif
+                  </tbody>
+              </table>
+          </div>
+
+          @endforeach
+      </div>
       <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">..3.</div>
   </div>
 
@@ -295,317 +547,175 @@
       </div>
       <!-- segundo modal fim" -->
   </div>
+    <script>
+        $(function () {
+            $('.seeprojectdetailspopover').popover({
+                trigger: 'hover'
+            })
 
-  <script>
-      jQuery(function ($) {
+            $('.manageprojectpopover').popover({
+                trigger: 'hover'
+            })
 
-          /* CÓDIGO P DEIXA O POPUP MODAL ABERTO */
-          //$("#etapasDoProjetoModal").css("display", "block")
-          //$("#etapasDoProjetoModal").addClass("show")
-          /* FIM CÓDIGO P DEIXA O POPUP MODAL ABERTO */
+            let projectFilterVisible = false;
+            let userProjectFilterVisible = false;
 
+            // Função para exibir/ocultar o painel com filtros de projetos
+            const toggleFilterPanel = () => {
+                if(projectFilterVisible){
+                    // Faz com que a a DIV com o filtro suma
+                    $('#project-filter-container').addClass('d-none');
 
-// Primeiro Modal
+                    $('#button-show-project-filter > i').attr('class', "fas fa-filter")
+                    $('#button-show-project-filter').attr('title', "Exibir filtros avançados")
 
+                    projectFilterVisible = false;
+                }else{
+                    // Faz com que a a DIV com o filtro apareca
+                    $('#project-filter-container').removeClass('d-none');
 
-          // Manipulação dos Projetos
+                    $('#button-show-project-filter > i').attr('class', "fas fa-chevron-up")
+                    $('#button-show-project-filter').attr('title', "Ocultar filtros avançados")
+                    projectFilterVisible = true;
+                }
+            }
 
-          let projeto_name = $('#input-projeto').val();
-          let projeto_inicio = $('#input-data-inicio').val();
-          let projeto_termino = $('#input-data-termino').val();
-          let projeto_cliente = $('#selectCliente').val();
-          let projeto_contrato = $('#input-contrato').val();
-          let projeto_gerente = $('#selectGerente').val();
-          let projeto_equipe = $('#selectEquipe').val();
+            // Função para exibir/ocultar o painel com filtros de usuarios em projetos
+            const toggleUserProjectFilterPanel = () => {
+                if(userProjectFilterVisible){
+                    // Faz com que a a DIV com o filtro suma
+                    $('#user-project-filter-container').addClass('d-none');
 
-          var novoProjeto = {
-              nome: projeto_name,
-              inicio: projeto_inicio,
-              termino: projeto_termino,
-              cliente: projeto_cliente,
-              contrato: projeto_contrato,
-              gerente: projeto_gerente,
-              equipe: projeto_equipe,
-              etapas: []
-          }
+                    $('#button-toggle-advanced-member-project-filter > i').attr('class', "fas fa-filter")
+                    $('#button-toggle-advanced-member-project-filter').attr('title', "Exibir filtros avançados")
 
-          // Adicionar novo projeto no array
+                    userProjectFilterVisible = false;
+                }else{
+                    // Faz com que a a DIV com o filtro apareca
+                    $('#user-project-filter-container').removeClass('d-none');
 
-          $("#botao-projeto").click(() =>{
-              //Colocar validação e mudar troca de modal
-          });
+                    $('#button-toggle-advanced-member-project-filter > i').attr('class', "fas fa-chevron-up")
+                    $('#button-toggle-advanced-member-project-filter').attr('title', "Ocultar filtros avançados")
+                    userProjectFilterVisible = true;
+                }
+            }
 
+            $('#button-show-project-filter').click(() => {
+                toggleFilterPanel()
+            })
 
-// Segundo Modal
+            $('#button-toggle-advanced-member-project-filter').click(() => {
+                toggleUserProjectFilterPanel()
+            })
 
+            const limparFiltros = () => {
+                $('#selectProjetosServico').val([]);
+                $('button[data-id="selectProjetosServico"]').attr('title', 'Nada selecionado');
+                $('button[data-id="selectProjetosServico"] div.filter-option-inner-inner').html('Nada selecionado');
 
-          // Manipulação das etapas
+                $('#selectProjetosGerente').val([])
+                $('button[data-id="selectProjetosGerente"]').attr('title', 'Nada selecionado');
+                $('button[data-id="selectProjetosGerente"] div.filter-option-inner-inner').html('Nada selecionado');
 
-          var etapas = [];
+                $('#selectProjetosCliente').val([])
+                $('button[data-id="selectProjetosCliente"]').attr('title', 'Nada selecionado');
+                $('button[data-id="selectProjetosCliente"] div.filter-option-inner-inner').html('Nada selecionado');
 
-          // Criar nova etapa quando clicar no botão
+                $('input#input-buscar-projeto').val('')
+                $('input#input-buscar-projeto').focus()
 
-          $("#botao-etapa").click(() =>{
-              const etapa_name = $('#input-etapa').val();
-              const novaEtapa = {
-                  nome: etapa_name,
-                  inicio: "",
-                  termino: "",
-                  responsavel: 0,
-                  importancia: 0,
-                  subetapas: []
-              }
-              cadastrarEtapa(novaEtapa);
-          });
+                toggleFilterPanel()
+                fetch_customer_data()
+                $('#button-show-project-filter').attr('class', "btn btn-outline-secondary")
+            }
 
-          // Criar nova subetapa quando clicar no botão
+            const limparFiltrosUserProject = () => {
+                $('#selectMembrosProjetosServico').val([]);
 
-          $(document).on("click" , "button.botao-subetapa" , function() {
+                $('button[data-id="selectMembrosProjetosServico"]').attr('title', 'Nada selecionado');
+                $('button[data-id="selectMembrosProjetosServico"] div.filter-option-inner-inner').html('Nada selecionado');
 
-              const etapa = $(this).attr('data-id');
+                $('#selectMembrosProjetosGerente').val([])
+                $('button[data-id="selectMembrosProjetosGerente"]').attr('title', 'Nada selecionado');
+                $('button[data-id="selectMembrosProjetosGerente"] div.filter-option-inner-inner').html('Nada selecionado');
 
-              etapas[parseInt(etapa)].subetapas = [
-                  ...etapas[parseInt(etapa)].subetapas,
-                  {
-                      nome: "subetapa",
-                      inicio: "",
-                      termino: "",
-                      responsavel: 0,
-                      importancia: 0
-                  }
-              ]
-              listarEtapas();
-          })
-
-          // Cadastrar etapa no array
-
-          const cadastrarEtapa = (novaEtapa) => {
-              etapas.push(novaEtapa);
-              listarEtapas();
-          }
-
-          // Listar etapas
-
-          const listarEtapas = () => {
-              novoProjeto = {
-                  ...novoProjeto,
-                  etapas:etapas
-              }
-
-              document.querySelector("#lista-etapa").innerHTML = "";
-              let today = new Date();
-              let dd = today.getDate();
-              let mm = today.getMonth()+1; //January is 0!
-              let yyyy = today.getFullYear();
-              if(dd<10){
-                  dd='0'+dd
-              }
-              if(mm<10){
-                  mm='0'+mm
-              }
-
-              today = yyyy+'-'+mm+'-'+dd;
-
-              console.log(etapas)
-
-              const listarSubEtapasAA = (idx) => {
-                  let retorno = "";
-                  etapas[idx].subetapas.forEach((itemB, indexB) => {
-                      retorno += '<div data-id="'+indexB+'" class="container row ml-1">\
-                                  <label class="col-form-label">'+itemB.nome+'</label>\
-                                </div>\
-                                <div class="col-md-6">\
-                                    <div class="d-flex">\
-                                        <select data-id="'+indexB+'" value="'+itemB.importancia+'" class="select-important2 form-control form-control-sm btn-light">\
-                                            <option value="0" '+(itemB.importancia == "0"?"selected":"")+'>Importancia</option>\
-                                            <option value="1" '+(itemB.importancia == "1"?"selected":"")+'>No seu tempo</option>\
-                                            <option value="2" '+(itemB.importancia == "2"?"selected":"")+'>Comum</option>\
-                                            <option value="3" '+(itemB.importancia == "3"?"selected":"")+'>Urgente</option>\
-                                        </select>\
-                                        <select data-id="'+indexB+'" value="'+itemB.responsavel+'" class="select-responsavel2 form-control form-control-sm btn-light">\
-                                            <option value="0" '+(itemB.responsavel == "0"?"selected":"")+'>Responsavel</option>\
-                                            <option value="1" '+(itemB.responsavel == "1"?"selected":"")+'>Responsavelzinho</option>\
-                                            <option value="2" '+(itemB.responsavel == "2"?"selected":"")+'>Responsavelzinho2</option>\
-                                            <option value="3" '+(itemB.responsavel == "3"?"selected":"")+'>Irresponsavel</option>\
-                                        </select>\
-                                    </div>\
-                                </div>\
-                                <div class="col-md-5 d-flex align-items-center">\
-                                    <div class="row">\
-                                      <input data-id="'+indexB+'" min="'+today+'" value="'+itemB.inicio+'" type="date" class="form-control form-control-sm col-md-6 input-data-inicio-subetapa">\
-                                      <input data-id="'+indexB+'" min="'+today+'" value="'+itemB.termino+'" type="date" class="form-control form-control-sm col-md-6 input-data-termino-subetapa">\
-                                    </div>\
-                                </div>\
-                                <div class="col-md-1">\
-                                  <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">\
-                                    <button type="button" class="btn btn-danger">\
-                                      <i class="fas fa-times"></i>\
-                                    </button>\
-                                  </div>\
-                                </div>'
-                  });
-                  return retorno;
-              }
-
-              etapas.map((item, index) => {
-                  document.querySelector("#lista-etapa").innerHTML += '\
-                                <div data-id="'+index+'" class="row">\
-                                  <div class="col-12">\
-                                     <label class="col-form-label">'+item.nome+'</label>\
-                                  </div>\
-                                </div>\
-                                <div class="row">\
-                                  <div class="col-6">\
-                                      <div class="d-flex">\
-                                          <select data-id="'+index+'" value="'+item.importancia+'" class="select-important form-control form-control-sm btn-light">\
-                                              <option value="0" '+(item.importancia == "0"?"selected":"")+'>Importancia</option>\
-                                              <option value="1" '+(item.importancia == "1"?"selected":"")+'>No seu tempo</option>\
-                                              <option value="2" '+(item.importancia == "2"?"selected":"")+'>Comum</option>\
-                                              <option value="3" '+(item.importancia == "3"?"selected":"")+'>Urgente</option>\
-                                          </select>\
-                                          <select data-id="'+index+'" value="'+item.responsavel+'" class="select-responsavel form-control form-control-sm btn-light">\
-                                              <option value="0" '+(item.responsavel == "0"?"selected":"")+'>Responsavel</option>\
-                                              <option value="1" '+(item.responsavel == "1"?"selected":"")+'>Responsavelzinho</option>\
-                                              <option value="2" '+(item.responsavel == "2"?"selected":"")+'>Responsavelzinho2</option>\
-                                              <option value="3" '+(item.responsavel == "3"?"selected":"")+'>Irresponsavel</option>\
-                                          </select>\
-                                      </div>\
-                                  </div>\
-                                  <div class="col-auto" style="width:300px;">\
-                                      <div class="row">\
-                                        <input data-id="'+index+'" min="'+today+'" value="'+item.inicio+'" type="date" class="form-control form-control-sm col-md-6 input-data-inicio-etapa">\
-                                        <input data-id="'+index+'" min="'+today+'" value="'+item.termino+'" type="date" class="form-control form-control-sm col-md-6 input-data-termino-etapa">\
-                                      </div>\
-                                  </div>\
-                                  <div class="col-auto d-flex flex-row">\
-                                      <button type="button" data-id="'+index+'" class="btn btn-success btn-sm botao-subetapa">\
-                                        <i class="fas fa-plus"></i>\
-                                      </button>\
-                                      <button type="button" class="btn btn-sm btn-danger">\
-                                        <i class="fas fa-times"></i>\
-                                      </button>\
-                                  </div>\
-                                </div>\
-                                <div class="row lista-subetapa container">'+listarSubEtapasAA(index)+'</div>'
-              });
-          }
-
-          // Atualizar etapa quando importancia é selecionado
-
-          $(document).on("change" , "select.select-important" , function()
-          {
-              let etapa_importancia = $(this).find(":selected").attr("value")
-              let index_etapa = $(this).attr("data-id")
-              let atualizaEtapa = etapas.map( (item, index) => {
-                  if (index === parseInt(index_etapa)) {
-                      return {
-                          ...item,
-                          importancia:etapa_importancia
-                      }
-                  }
-                  return item
-              })
-              etapas = atualizaEtapa
-          });
-
-          // Atualizar etapa quando responsável é selecionado
-
-          $(document).on("change" , "select.select-responsavel" , function()
-          {
-              let etapa_responsavel = $(this).find(":selected").attr("value")
-              let index_etapa = $(this).attr("data-id")
-              let atualizaEtapa = etapas.map( (item, index) => {
-                  if (index === parseInt(index_etapa)) {
-                      return {
-                          ...item,
-                          responsavel:etapa_responsavel
-                      }
-                  }
-                  return item
-              })
-              etapas = atualizaEtapa
-          });
-
-          // Atualizar etapa quando data inicio é selecionado
-
-          $(document).on("change" , "input.input-data-inicio-etapa" , function()
-          {
-              let data_inicio = $(this).val()
-              let index_etapa = $(this).attr("data-id")
-              let atualizaEtapa = etapas.map( (item, index) => {
-                  if (index === parseInt(index_etapa)) {
-                      return {
-                          ...item,
-                          inicio:data_inicio
-                      }
-                  }
-                  return item
-              })
-              etapas = atualizaEtapa
-          });
-
-          // Atualizar etapa quando data termino é selecionado
-
-          $(document).on("change" , "input.input-data-termino-etapa" , function()
-          {
-              let data_termino = $(this).val()
-              let index_etapa = $(this).attr("data-id")
-              let atualizaEtapa = etapas.map( (item, index) => {
-                  if (index === parseInt(index_etapa)) {
-                      return {
-                          ...item,
-                          termino:data_termino
-                      }
-                  }
-                  return item
-              })
-              etapas = atualizaEtapa
-          });
+                $('#selectMembrosProjetosCliente').val([])
+                $('button[data-id="selectMembrosProjetosCliente"]').attr('title', 'Nada selecionado');
+                $('button[data-id="selectMembrosProjetosCliente"] div.filter-option-inner-inner').html('Nada selecionado');
 
 
-// Limitando data de inicio e de termino...
 
 
-          //Para o Projeto
-
-          $("#input-data-inicio").click(function() {
-              let today = new Date();
-              let dd = today.getDate();
-              let mm = today.getMonth()+1; //January is 0!
-              let yyyy = today.getFullYear();
-              if(dd<10){
-                  dd='0'+dd
-              }
-              if(mm<10){
-                  mm='0'+mm
-              }
-
-              today = yyyy+'-'+mm+'-'+dd;
-              document.getElementById("input-data-inicio").setAttribute("min", today);
-          });
-
-          $("#input-data-termino").click(function() {
-              let inicio = $('#input-data-inicio').val();
-              $("#input-data-termino").attr("min", inicio);
-          });
-
-          //Para as Etapas
-
-          $(document).on("change" , "input.input-data-inicio-etapa" , function() {
-              let inicio = $(this).val();
-              let index_etapa = $(this).attr("data-id");
-              $('.input-data-termino-etapa[data-id="'+index_etapa+'"]').attr("min", inicio).val("");
-          })
-
-          //Para as SubEtapas
-
-          $(document).on("change" , "input.input-data-inicio-subetapa" , function() {
-              let inicio = $(this).val();
-              let index_etapa = $(this).attr("data-id");
-              $('.input-data-termino-subetapa[data-id="'+index_etapa+'"]').attr("min", inicio).val("");
-          })
+                $('input#input-buscar-membro-projeto').val('')
+                $('input#input-buscar-membro-projeto').focus()
 
 
-      });
-  </script>
+                toggleUserProjectFilterPanel()
+                $('#button-toggle-advanced-member-project-filter').attr('class', "btn btn-outline-secondary")
+            }
+
+            $('#button-clear-filter-data').on('click', () => {
+                limparFiltros()
+            })
+
+            $('#button-clear-filter-membro-projeto-data').on('click', () => {
+                limparFiltrosUserProject()
+            })
+
+            function fetch_customer_data(query = '')
+            {
+                $.ajax({
+                    url:"{{ route('projetos.search.do') }}",
+                    method:'GET',
+                    data:{
+                        query:query,
+                        servicos: JSON.stringify($('#selectProjetosServico').val()),
+                        gerentes: JSON.stringify($('#selectProjetosGerente').val()),
+                        clientes: JSON.stringify($('#selectProjetosCliente').val())
+                    },
+                    dataType:'json',
+                    beforeSend: function(){
+                        $('#projetos-table-body').html("<tr> <td colspan='9'><i class='fas fa-3x fa-spin fa-sync'></i></td> </tr>");
+                    },
+                    success:function(data)
+                    {
+                        $('#projetos-table-body').html(data.table_data);
+                        $('#qtd-resultado-busca').text("Foram encontrados "+data.total_data+" projetos");
+                    },
+                    complete: function (data) {
+                        console.log("aaaa", data)
+                    }
+                })
+            }
+
+            var delay = (function(){
+                var timer = 0;
+                return function(callback, ms){
+                    clearTimeout (timer);
+                    timer = setTimeout(callback, ms);
+                };
+            })();
+
+            $('input#input-buscar-projeto').keyup(function() {
+                delay(() => {
+                    let query = $(this).val();
+                    fetch_customer_data(query);
+
+                    if(query !== ""){
+                        $('#button-show-project-filter').attr('class', "btn btn-danger")
+                    }else{
+                        $('#button-show-project-filter').attr('class', "btn btn-outline-secondary")
+                    }
+                }, 1000 );
+            });
+
+            $('.filter-input').on('change', function () {
+                delay(() => {
+                    let query = $('input#input-buscar-projeto').val();
+                    fetch_customer_data(query);
+                    $('#button-show-project-filter').attr('class', "btn btn-danger")
+                }, 1500 );
+            })
+        })
+    </script>
 @endsection

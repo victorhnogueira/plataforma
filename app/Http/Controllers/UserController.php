@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Curso;
 use App\User;
 use Illuminate\Http\Request;
+use function GuzzleHttp\Promise\all;
 
 class UserController extends Controller
 {
@@ -15,7 +16,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $membros = User::all();
+        return view('membros.index', compact('membros'));
     }
 
     /**
@@ -26,6 +28,18 @@ class UserController extends Controller
     public function create()
     {
         //
+    }
+
+    public function cadastrar_membro(Request $request)
+    {
+        $nome_da_rua = $request->get('nome_rua');
+
+        // realizar o cadastro;
+    }
+
+    public function cadastrar()
+    {
+       return view('membros.cadastrar');
     }
 
     /**

@@ -12,7 +12,7 @@ Essa plataforma tem como objetivo ser um software que centraliza dados para uma 
 ### Laragon
 Inicie o laragon....
 
-## Desenvolvedores
+## Desenvolvedor    es
 
 Equipe de projetos
 

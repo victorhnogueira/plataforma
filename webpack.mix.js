@@ -21,4 +21,5 @@ mix
         'resources/views/layouts/basetemplate/js/sb-admin.js'
     ], 'public/site/js/sbadmin.js')
     .js('resources/js/app.js', 'public/site/app.js')
+    .scripts('resources/views/projetos/js/novoProjeto.js', 'public/site/js/novoProjeto.js')
     .version();

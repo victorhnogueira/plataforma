@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->string("profile_image");
             $table->string("numero_matricula");
             $table->foreignId("curso_id")->constrained("cursos");
             $table->foreignId("cargo_id")->constrained("cargos");

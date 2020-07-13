@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -37,6 +38,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function firstName()
+    {
+        return Str::before($this->name, " ");
+    }
+
     public function curso()
     {
         return $this->belongsTo(Curso::class, "curso_id", "id");
@@ -45,5 +51,16 @@ class User extends Authenticatable
     public function cargo()
     {
         return $this->belongsTo(Cargo::class, "cargo_id", "id");
+    }
+
+//    TODO: rever esse relacionamento
+//    public function gerenteNosProjetos()
+//    {
+//        return $this->hasMany(Projeto::class, "gerente_id", "id");
+//    }
+
+    public function projetos()
+    {
+        return $this->belongsToMany(Projeto::class, 'projetos_users','user_id', 'projeto_id')->withPivot('funcao');
     }
 }

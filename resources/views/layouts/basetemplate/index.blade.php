@@ -74,7 +74,7 @@
 
         <!-- Nav Item - Membros -->
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{{ Route('membros.index') }}">
             <i class="fas fa-fw fa-users"></i>
             <span>Membros</span></a>
         </li>
@@ -339,7 +339,7 @@
                                 <br/>
                                 <small>{{ Auth::user()->cargo->nome }}</small>
                             </span>
-                            <img class="img-profile rounded-circle" src="{{ asset('/images/victor.png') }}">
+                            <img class="img-profile rounded-circle" src="{{ asset('/images/'.Auth::user()->profile_image) }}">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">

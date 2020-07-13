@@ -30,8 +30,14 @@ Route::post('/capacitacoes/materiaisdeapoio/create', 'MateriaisDeApoioController
 Route::get('/capacitacoes/materiaisdeapoio/{materialDeApoio}', 'MateriaisDeApoioController@showitem')->name('capacitacoes.materiaisapoio.showitem');
 
 
-Route::get('/projetos', 'HomeController@projetos')->name('projetos.show');
+Route::get('/projetos', 'ProjetoController@index')->name('projetos.show');
 Route::get('/projetos/gerenciar', 'HomeController@projetosGerenciar')->name('projetos.gerenciar');
+Route::get('/projetos/search', 'ProjetoController@search')->name('projetos.search.do');
+
+
+Route::get('/membros', 'UserController@index')->name('membros.index');
+Route::get('/membros/cadastrar', 'UserController@cadastrar')->name('membros.cadastrar');
+Route::get('/membros/cadastrar/do', 'UserController@cadastrar_membro')->name('membros.cadastrar.do');
 
 
 Route::get('/perfil', 'UserController@show')->name('perfil.show');
